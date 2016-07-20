@@ -1,19 +1,16 @@
 
-import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
-import java.util.UUID;
+import java.util.List;
 
 import com.amazonaws.AmazonClientException;
 import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
 import com.amazonaws.regions.Region;
 import com.amazonaws.regions.Regions;
@@ -23,6 +20,7 @@ import com.amazonaws.services.s3.model.Bucket;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.ListObjectsRequest;
 import com.amazonaws.services.s3.model.ObjectListing;
+import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectSummary;
@@ -50,7 +48,7 @@ public class test1 {
 
         String bucketName = "testssss";
         String key = "MyObjectKey";
-
+        String key1 = " sdfsd";
         
         try {
             
@@ -62,9 +60,9 @@ public class test1 {
             }
             System.out.println();
 
-            
+            File tt = createFile();
             System.out.println("Uploading a new object to S3 from a file\n");
-            s3.putObject(new PutObjectRequest(bucketName, key, createSampleFile()));
+            s3.putObject(new PutObjectRequest(bucketName, key, tt));
 
             
             
@@ -81,6 +79,15 @@ public class test1 {
             System.out.println("Deleting an object\n");
             s3.deleteObject(bucketName, key);
 */
+            
+
+            List<Bucket> buckets = s3.listBuckets();
+            
+            ObjectMetadata ob = new ObjectMetadata();
+            ob.setContentLength(9);
+            String teststr = "sdfasafda";
+            InputStream is = new ByteArrayInputStream(teststr.getBytes("UTF-8"));
+            s3.putObject(new PutObjectRequest(buckets.get(0).getName(), key1, is, ob));
             
         } catch (AmazonServiceException ase) {
             System.out.println("Caught an AmazonServiceException, which means your request made it "
@@ -99,9 +106,9 @@ public class test1 {
     }
 
   
-    private static File createSampleFile() throws IOException {
+    private static File createFile() throws IOException {
     	String numberString = "";
-    	File file =new File("randomNumber.txt");
+    	File file =new File("randomNumber1.txt");
 		for(int i=0;i<10;i++){
 			double n = Math.random();
 			n *= 100;
