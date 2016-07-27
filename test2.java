@@ -8,7 +8,6 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.autoscaling.model.Tag;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.AuthorizeSecurityGroupIngressRequest;
@@ -23,6 +22,7 @@ import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
 import com.amazonaws.services.ec2.model.SpotInstanceRequest;
 import com.amazonaws.services.ec2.model.SpotPlacement;
+import com.amazonaws.services.ec2.model.Tag;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 
 
@@ -174,7 +174,7 @@ public class test2 {
 			          // Do nothing because it woke up early.
 			      }
 			  } while (anyOpen);
-			/*
+			
 			ArrayList<Tag> instanceTags = new ArrayList<Tag>();
 			instanceTags.add(new Tag());
 
@@ -195,7 +195,7 @@ public class test2 {
 			    System.out.println("Error Code: " + e.getErrorCode());
 			    System.out.println("Request ID: " + e.getRequestId());
 			}
-			*/
+			
 			try {
 			    // Cancel requests.
 			    CancelSpotInstanceRequestsRequest cancelRequest = new CancelSpotInstanceRequestsRequest(spotInstanceRequestIds);
