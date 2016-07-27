@@ -8,11 +8,13 @@ import com.amazonaws.AmazonServiceException;
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.PropertiesCredentials;
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
+import com.amazonaws.services.autoscaling.model.Tag;
 import com.amazonaws.services.ec2.AmazonEC2;
 import com.amazonaws.services.ec2.AmazonEC2Client;
 import com.amazonaws.services.ec2.model.AuthorizeSecurityGroupIngressRequest;
 import com.amazonaws.services.ec2.model.CancelSpotInstanceRequestsRequest;
 import com.amazonaws.services.ec2.model.CreateSecurityGroupRequest;
+import com.amazonaws.services.ec2.model.CreateTagsRequest;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsRequest;
 import com.amazonaws.services.ec2.model.DescribeSpotInstanceRequestsResult;
 import com.amazonaws.services.ec2.model.IpPermission;
@@ -20,6 +22,7 @@ import com.amazonaws.services.ec2.model.LaunchSpecification;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesRequest;
 import com.amazonaws.services.ec2.model.RequestSpotInstancesResult;
 import com.amazonaws.services.ec2.model.SpotInstanceRequest;
+import com.amazonaws.services.ec2.model.SpotPlacement;
 import com.amazonaws.services.ec2.model.TerminateInstancesRequest;
 
 
@@ -30,6 +33,9 @@ public class test2 {
 			// Retrieves the credentials from an AWSCredentials.properties file.
 			AWSCredentials credentials = null;
 			credentials = new ProfileCredentialsProvider().getCredentials();
+			
+			//credentials = new PropertiesCredentials(
+			//        GettingStartedApp.class.getResourceAsStream("AwsCredentials.properties"));
 		
 			// Create the AmazonEC2Client object so we can call various APIs.
 			AmazonEC2 ec2 = new AmazonEC2Client(credentials);
@@ -86,7 +92,8 @@ public class test2 {
 
 			// Request 1 x t1.micro instance with a bid price of $0.03.
 			requestRequest.setSpotPrice("0.03");
-			requestRequest.setInstanceCount(Integer.valueOf(1));
+			requestRequest.setInstanceCount(Integer.valueOf(5));
+			requestRequest.setType("persistent");
 
 			// Setup the specifications of the launch. This includes the
 			// instance type (e.g. t1.micro) and the latest Amazon Linux
@@ -100,6 +107,12 @@ public class test2 {
 			ArrayList<String> securityGroups = new ArrayList<String>();
 			securityGroups.add("GettingStartedGroup");
 			launchSpecification.setSecurityGroups(securityGroups);
+
+			
+			
+			SpotPlacement placement = new SpotPlacement();
+			placement.setGroupName("ADVANCED-DEMO-PLACEMENT-GROUP");
+			launchSpecification.setPlacement(placement);
 
 			// Add the launch specifications to the request.
 			requestRequest.setLaunchSpecification(launchSpecification);
@@ -119,7 +132,7 @@ public class test2 {
 			    spotInstanceRequestIds.add(requestResponse.getSpotInstanceRequestId());
 			}
 			boolean anyOpen;
-
+			ArrayList<String> instanceIds = new ArrayList<String>();
 			do {
 			    // Create the describeRequest object with all of the request ids
 			    // to monitor (e.g. that we started).
@@ -161,7 +174,28 @@ public class test2 {
 			          // Do nothing because it woke up early.
 			      }
 			  } while (anyOpen);
-			
+			/*
+			ArrayList<Tag> instanceTags = new ArrayList<Tag>();
+			instanceTags.add(new Tag());
+
+			// Create the tag request
+			CreateTagsRequest createTagsRequest_instances = new CreateTagsRequest();
+			createTagsRequest_instances.setResources(instanceIds);
+			createTagsRequest_instances.setTags(instanceTags);
+
+			// Tag the instance
+			try {
+			    ec2.createTags(createTagsRequest_instances);
+			}
+			catch (AmazonServiceException e) {
+			    // Write out any exceptions that may have occurred.
+			    System.out.println("Error terminating instances");
+			    System.out.println("Caught Exception: " + e.getMessage());
+			    System.out.println("Reponse Status Code: " + e.getStatusCode());
+			    System.out.println("Error Code: " + e.getErrorCode());
+			    System.out.println("Request ID: " + e.getRequestId());
+			}
+			*/
 			try {
 			    // Cancel requests.
 			    CancelSpotInstanceRequestsRequest cancelRequest = new CancelSpotInstanceRequestsRequest(spotInstanceRequestIds);
@@ -174,6 +208,9 @@ public class test2 {
 			    System.out.println("Error Code: " + e.getErrorCode());
 			    System.out.println("Request ID: " + e.getRequestId());
 			}
+			
+			
+			
 			
 			try {
 			    // Terminate instances.
@@ -189,7 +226,8 @@ public class test2 {
 			}
 			
 			
-
+			
+			
 	 }
 	 
 }
